@@ -7,18 +7,56 @@
 
 /*  -------------------------------------------------------------  */
 
-/*
--- Typography
-*/
+/*  Typography  */
 
-/*
--- Structure
-*/
+/*  Structure */
 
-/*
--- General Use
-*/
+  .game-board-outer {
 
-/*
--- Site Sections
-*/
+  }
+
+  .game-board {
+    width: 50%;
+    margin: 2em auto;
+    padding: 10%;
+    background-color: #efefef;
+    border-style: solid;
+    border-color: #000;
+    border-width: 1px;
+    border-radius: 2%;
+    /*box-shadow: 0.3em 0.3em 0.6em grey;*/
+  }
+
+  .question-display-row,
+  .answer-display-row,
+  .buttons-display-row,
+  .timer-row {
+
+  }
+
+  #liveQues {
+
+  }
+
+  #liveAnsrOpts {
+
+  }
+
+  .answer-options-radio-buttons {
+    margin-left: 15%
+    padding-left: 5%;
+  }
+
+  #gamePlayBtns {
+
+  }
+
+  #timer {
+
+  }
+
+
+
+/*  General Use */
+
+/*  Site Sections */

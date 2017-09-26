@@ -24,7 +24,31 @@
  </head>
  <body>
 
+   <div class="game-board-outer">
 
+     <div class="container game-board">
+
+       <div class="row question-display-row">
+         <p><span id="liveQues"></span></p>
+       </div>
+
+       <div class="row answer-options-display-row">
+         <p><span id="liveAnsrOpts"></span></p>
+       </div>
+
+       <div class="row buttons-display-row">
+        <p><span id="gamePlayBtns"></span>
+          <button>Press Me</button>
+        </p>
+       </div>
+
+       <div class="row timer-row">
+         <p><span id="timer"></span></p>
+       </div>
+
+     </div> <!-- Close game-board -->
+
+   </div> <!-- Close game-board-outer -->
 
 
 
@@ -35,7 +59,10 @@
   <!-- Bootstrap javascript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
-  <!-- Trivia Game javascript sheet -->
+  <!-- Trivia Game Objects -->
+  <script src="assets/javascript/triviaGameObjects.js"></script>
+
+  <!-- Trivia Game javascript app sheet -->
   <script src="assets/javascript/app.js"></script>
 
  </body>
