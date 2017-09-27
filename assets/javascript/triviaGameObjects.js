@@ -87,7 +87,8 @@ function TriviaGame(questions) {
   this.totCorAnsr = 0;
   this.totIncorAnsr = 0;
   this.curQuesIndex = 0;
-  this.clock = "";
+  this.clock = 1;
+  this.clockUp = "";
 
   //
   //  TriviaGame Methods
@@ -196,7 +197,7 @@ function TriviaGame(questions) {
   };
   this.quesRight = function(gameObj) {
     var gameObj = gameObj;
-    clearInterval(gameObj.clock);
+    clearInterval(gameObj.clockUp);
     $("#timer").empty();
     gameObj.renderAnsrDisplay(gameObj);
     gameObj.ansrDispCorrect(gameObj);
@@ -210,10 +211,24 @@ function TriviaGame(questions) {
   };
   this.quesWrong = function(gameObj) {
     var gameObj = gameObj;
-    clearInterval(gameObj.clock);
+    clearInterval(gameObj.clockUp);
     $("#timer").empty();
     gameObj.renderAnsrDisplay(gameObj);
     gameObj.ansrDispIncorrect(gameObj);
+    gameObj.totIncorAnsr++;
+    gameObj.curQuesIndex++;
+    if(gameObj.curQuesIndex<gameObj.questions.length) {
+      setTimeout(gameObj.next, 2000, gameObj);
+    } else {
+      setTimeout(gameObj.gameOver, 2000, gameObj);
+    }
+  };
+  this.quesTimeUp = function(gameObj) {
+    var gameObj = gameObj;
+    clearInterval(gameObj.clockUp);
+    $("#timer").empty();
+    gameObj.renderAnsrDisplay(gameObj);
+    gameObj.ansrDispTimeUp(gameObj);
     gameObj.totIncorAnsr++;
     gameObj.curQuesIndex++;
     if(gameObj.curQuesIndex<gameObj.questions.length) {
@@ -264,9 +279,14 @@ function TriviaGame(questions) {
     $("#ansrDispHeader").text("Oh No! That's Completely and Utterly Wrong, You Poor Thing You");
     $("#ansrDispAnsr").text("The Answer is: " + gameObj.questions[gameObj.curQuesIndex].corAnsr);
   };
+  this.ansrDispTimeUp = function(gameObj) {
+    var gameObj = gameObj;
+    $("#ansrDispHeader").text("Oh No! You're Terrible! You Ran Out of Time!");
+    $("#ansrDispAnsr").text("The Answer is: " + gameObj.questions[gameObj.curQuesIndex].corAnsr);
+  };
   this.gameOver = function(gameObj) {
     var gameObj = gameObj;
-    clearInterval(gameObj.clock);
+    clearInterval(gameObj.clockUp);
     $("#timer").empty();
     gameObj.renderGameBoard(gameOverAttrs);
     gameObj.renderGameOver(gameObj);
@@ -282,14 +302,17 @@ function TriviaGame(questions) {
     $("#gameOverBody").html(newUl);
   };
   this.dispClock = function(quesTime, gameObj) {
-    var quesTime = quesTime;
     var gameObj = gameObj;
-    $("#timer").text(quesTime + " seconds left ...");
-    quesTime--;
-    gameObj.clock = setInterval(function(){
-      $("#timer").text(quesTime + " seconds left ...");
-      quesTime--;
-    }, 1000);
+    gameObj.clock = quesTime;
+    gameObj.clockUp = setInterval(function(){
+        $("#timer").text(gameObj.clock + " seconds left ...");
+        gameObj.clock--;
+        if(gameObj.clock<0) {
+          clearInterval(gameObj.clockUp);
+          gameObj.quesTimeUp(gameObj);
+        }
+      }, 1000);
+
   };
 }
 
