@@ -42,9 +42,12 @@
 
   }
 
-  .answer-options-radio-buttons {
-    margin-left: 15%
-    padding-left: 5%;
+  input[type="radio"] {
+    margin-right: 0.8em;
+  }
+
+  ul {
+    line-height: 2;
   }
 
   #gamePlayBtns {
