@@ -10,8 +10,6 @@
 //
 //    Utilities Object Constructor Function
 //
-//      These are static functions
-//
 function Utilities () {
   this.shuffleArray = function(array) {
     var newArray = array;
@@ -31,26 +29,26 @@ var utils = new Utilities();
 //
 //    QuestionList Object Constructor Function
 //
-function Question(quesStr, ansrOpts, corAnsrIndex) {
-  this.quesStr = quesStr;
-  this.ansrOpts = ansrOpts;
-  this.corAnsr = ansrOpts[corAnsrIndex];
+// function Question(quesStr, ansrOpts, corAnsrIndex) {
+//   this.quesStr = quesStr;
+//   this.ansrOpts = ansrOpts;
+//   this.corAnsr = ansrOpts[corAnsrIndex];
+//
+// }
 
-}
-
-var questionList = [];
-
-var gameQuestion1 = new Question ("What is Bo's name?", ["Bo", "George", "Not Bo", "Carl"], 0);
-questionList.push(gameQuestion1);
-
-var gameQuestion2 = new Question ("What is Bo's game?", ["Potatoes", "Trivia", "Not Potatoes", "Logistics"], 1);
-questionList.push(gameQuestion2);
-
-var gameQuestion3 = new Question ("Who is Bo's dame?", ["Carl", "George", "What's today?", "Not Carl"], 2);
-questionList.push(gameQuestion3);
-
-var gameQuestion4 = new Question ("What is Bo's fame?", ["Judo", "Pasta", "Curling", "Grilling"], 3);
-questionList.push(gameQuestion4);
+// var questionList = [];
+//
+// var gameQuestion1 = new Question ("What is Bo's name?", ["Bo", "George", "Not Bo", "Carl"], 0);
+// questionList.push(gameQuestion1);
+//
+// var gameQuestion2 = new Question ("What is Bo's game?", ["Potatoes", "Trivia", "Not Potatoes", "Logistics"], 1);
+// questionList.push(gameQuestion2);
+//
+// var gameQuestion3 = new Question ("Who is Bo's dame?", ["Carl", "George", "What's today?", "Not Carl"], 2);
+// questionList.push(gameQuestion3);
+//
+// var gameQuestion4 = new Question ("What is Bo's fame?", ["Judo", "Pasta", "Curling", "Grilling"], 3);
+// questionList.push(gameQuestion4);
 
 
 var gameBoardAttrs = [{
@@ -81,8 +79,10 @@ var gameOverAttrs = [{
 }];
 
 
+
+
 function TriviaGame(questions) {
-  this.questions = questions; // An array of Question Objects
+  this.questions = [];
   this.userGuess = "";
   this.totCorAnsr = 0;
   this.totIncorAnsr = 0;
@@ -93,12 +93,44 @@ function TriviaGame(questions) {
   //
   //  TriviaGame Methods
   //
+
   this.gameOn = function(gameObj) {
     var gameObj = gameObj;
-    // $("#gameBoardSwitch").show();
-    // for(var i=0; i<this.questions.length; i++) {
-        this.next(gameObj);
 
+    this.callAJAX(gameObj);
+
+  };
+  this.callAJAX = function(gameObj) {
+    var gameObj = gameObj;
+    var queryURL = "https://opentdb.com/api.php?amount=10&category=17&difficulty=easy";
+
+    $.ajax({
+      url: queryURL,
+      type: "GET",
+    }).done(
+      function(response) {
+        gameObj.questions = response.results;
+        console.log(gameObj.questions[0].correct_answer);
+        gameObj.organizeAnswers(gameObj);
+        gameObj.next(gameObj);
+      }
+    );
+
+
+  };
+
+  this.organizeAnswers = function(gameObj) {
+    var gameObj = gameObj;
+
+    for(var i=0; i<10; i++) {
+      gameObj.questions[i].ansrOpts = [];
+      for(var j=0; j<3; j++) {
+        gameObj.questions[i].ansrOpts[j] = gameObj.questions[i].incorrect_answers[j];
+      }
+      gameObj.questions[i].ansrOpts.push(gameObj.questions[i].correct_answer);
+
+      utils.shuffleArray(gameObj.questions[i].ansrOpts);
+    }
 
   };
   this.next = function(gameObj) {
@@ -106,7 +138,7 @@ function TriviaGame(questions) {
       gameObj.renderGameBoard(gameBoardAttrs);
       gameObj.dispNxtQues(gameObj);
       gameObj.questionResults(gameObj);
-      gameObj.dispClock(8, gameObj);
+      gameObj.dispClock(12, gameObj);
 
   };
 
@@ -141,7 +173,7 @@ function TriviaGame(questions) {
   };
   this.dispNxtQuesStr = function(gameObj) {
     var gameObj = gameObj
-    $("#liveQues").text(gameObj.questions[gameObj.curQuesIndex].quesStr);
+    $("#liveQues").text(gameObj.questions[gameObj.curQuesIndex].question);
   };
   this.dispNxtQuesAnsrOpts = function(gameObj) {
     var gameObj = gameObj;
@@ -151,12 +183,12 @@ function TriviaGame(questions) {
       newRadio.attr({
         "type":"radio",
         "name":"answerOptions",
-        "value": this.questions[this.curQuesIndex].ansrOpts[i]
+        "value": gameObj.questions[gameObj.curQuesIndex].ansrOpts[i]
       });
 
       var newLi = $("<li></li>");
       newLi.html(newRadio);
-      newLi.append(this.questions[this.curQuesIndex].ansrOpts[i]);
+      newLi.append(gameObj.questions[gameObj.curQuesIndex].ansrOpts[i]);
 
     newUl.append(newLi);
     }
@@ -189,7 +221,7 @@ function TriviaGame(questions) {
   };
   this.compareAnsr = function(game) {
     var gameObj = game;
-    if(gameObj.userGuess == gameObj.questions[gameObj.curQuesIndex].corAnsr) {
+    if(gameObj.userGuess == gameObj.questions[gameObj.curQuesIndex].correct_answer) {
       return true;
     } else {
       return false;
@@ -272,17 +304,17 @@ function TriviaGame(questions) {
   this.ansrDispCorrect = function(gameObj) {
     var gameObj = gameObj;
     $("#ansrDispHeader").text("Good Job You Oh You!");
-    $("#ansrDispAnsr").text("The Answer is: " + gameObj.questions[gameObj.curQuesIndex].corAnsr);
+    $("#ansrDispAnsr").text("The Answer is: " + gameObj.questions[gameObj.curQuesIndex].correct_answer);
   };
   this.ansrDispIncorrect = function(gameObj) {
     var gameObj = gameObj;
     $("#ansrDispHeader").text("Oh No! That's Completely and Utterly Wrong, You Poor Thing You");
-    $("#ansrDispAnsr").text("The Answer is: " + gameObj.questions[gameObj.curQuesIndex].corAnsr);
+    $("#ansrDispAnsr").text("The Answer is: " + gameObj.questions[gameObj.curQuesIndex].correct_answer);
   };
   this.ansrDispTimeUp = function(gameObj) {
     var gameObj = gameObj;
     $("#ansrDispHeader").text("Oh No! You're Terrible! You Ran Out of Time!");
-    $("#ansrDispAnsr").text("The Answer is: " + gameObj.questions[gameObj.curQuesIndex].corAnsr);
+    $("#ansrDispAnsr").text("The Answer is: " + gameObj.questions[gameObj.curQuesIndex].correct_answer);
   };
   this.gameOver = function(gameObj) {
     var gameObj = gameObj;
@@ -290,6 +322,7 @@ function TriviaGame(questions) {
     $("#timer").empty();
     gameObj.renderGameBoard(gameOverAttrs);
     gameObj.renderGameOver(gameObj);
+    gameObj.renderReset(gameObj);
   };
   this.renderGameOver = function(gameObj) {
     var gameObj = gameObj;
@@ -314,8 +347,27 @@ function TriviaGame(questions) {
       }, 1000);
 
   };
+  this.renderReset = function(gameObj) {
+    var gameObj = gameObj
+    var btn = $("<button></button>");
+    btn.attr("id","game-over-btns-row");
+    btn.text("Click It Here");
+    $("#gameOverBtns").append(btn);
+
+    $("#gameOverBtns").on("click",function() {
+      console.log("reset clicked");
+      gameObj.userGuess = "";
+      gameObj.totCorAnsr = 0;
+      gameObj.totIncorAnsr = 0;
+      gameObj.curQuesIndex = 0;
+      gameObj.callAJAX(gameObj);
+    });
+  };
 }
 
-var game = new TriviaGame(questionList);
+
+
+
+var game = new TriviaGame();
 
 game.gameOn(game);

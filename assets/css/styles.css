@@ -10,6 +10,15 @@
 /*  Typography  */
 
 /*  Structure */
+.body {
+  background-image: url("../images/greenBG.jpeg");
+
+}
+
+.game-board-outer {
+  background-image: url("../images/greenBG.jpeg");
+  margin-top: 2em;
+}
 
   .game-board-outer {
 
@@ -17,15 +26,25 @@
 
   .game-board {
     width: 50%;
-    margin: 2em auto;
+    margin: auto auto;
+    min-height: 32em;
     padding: 10%;
-    background-color: #efefef;
+    background-color: #fff;
+    /*background-image: url("../images/curtainsDown.jpeg");*/
+    background-size: 100%;
     border-style: solid;
     border-color: #000;
     border-width: 1px;
     border-radius: 2%;
     /*box-shadow: 0.3em 0.3em 0.6em grey;*/
   }
+
+  /*.curtains {
+    background-image: url("../images/curtainsPulledSide.png");
+    background-size: 100%;
+    z-index: 999;
+    width: 100%;
+  }*/
 
   .question-display-row,
   .answer-display-row,
