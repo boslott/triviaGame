@@ -78,6 +78,26 @@ var gameOverAttrs = [{
   spanId:"gameOverBtns"
 }];
 
+var apiCategoryInfo = [{
+  url:"https://opentdb.com/api.php?amount=10&difficulty=easy",
+  category: "All Category"
+},
+{
+  url:"https://opentdb.com/api.php?amount=10&category=9&difficulty=easy",
+  category: "General Knowledge"
+},
+{
+  url:"https://opentdb.com/api.php?amount=10&category=18&difficulty=easy",
+  category: "Science: Computers"
+},
+{
+  url:"https://opentdb.com/api.php?amount=10&category=21&difficulty=easy",
+  category: "Sports"
+},
+{
+  url:"https://opentdb.com/api.php?amount=10&category=14&difficulty=easy",
+  category: "Entertainment: Television"
+}];
 
 
 
@@ -87,8 +107,11 @@ function TriviaGame(questions) {
   this.totCorAnsr = 0;
   this.totIncorAnsr = 0;
   this.curQuesIndex = 0;
-  this.clock = 1;
+  this.clock = 0;
   this.clockUp = "";
+  this.categories = apiCategoryInfo;
+  this.curCategory;
+
 
   //
   //  TriviaGame Methods
@@ -97,26 +120,61 @@ function TriviaGame(questions) {
   this.gameOn = function(gameObj) {
     var gameObj = gameObj;
 
-    this.callAJAX(gameObj);
-
+    gameObj.renderCategoryBtns(gameObj);
+    gameObj.chooseCat(gameObj);
   };
-  this.callAJAX = function(gameObj) {
+
+  this.renderCategoryBtns = function(gameObj) {
     var gameObj = gameObj;
-    var queryURL = "https://opentdb.com/api.php?amount=10&category=17&difficulty=easy";
+    $("#gameBoardSwitch").empty();
+
+    var newDivHeader = $("<div></div>");
+    newDivHeader.addClass("theme-header-row")
+
+    var newH2 = $("<h2></h2>");
+    newH2.addClass("theme-header");
+    newH2.text("Choose Your Category:");
+
+    newDivHeader.append(newH2);
+    $("#gameBoardSwitch").append(newDivHeader);
+
+    var newDiv = $("<div></div>");
+    newDiv.addClass("row category-btns-row");
+
+    for(var i=0; i<5; i++) {
+      var btn = $("<button></button>");
+      btn.addClass("btn btn-default cat-btn");
+      btn.attr("value",gameObj.categories[i].url);
+      btn.text(gameObj.categories[i].category);
+      newDiv.append(btn);
+    }
+    $("#gameBoardSwitch").append(newDiv);
+  };
+
+  this.chooseCat = function(gameObj) {
+    var gameObj = gameObj;
+
+    $(".cat-btn").on("click",function() {
+      gameObj.curCategory = this.value;
+      gameObj.callAJAX(gameObj, gameObj.curCategory);
+
+    });
+  };
+
+  this.callAJAX = function(gameObj, url) {
+    var gameObj = gameObj;
+    var queryURL = url;
 
     $.ajax({
       url: queryURL,
       type: "GET",
-    }).done(
-      function(response) {
+    })
+    .done(function(response) {
         gameObj.questions = response.results;
-        console.log(gameObj.questions[0].correct_answer);
         gameObj.organizeAnswers(gameObj);
         gameObj.next(gameObj);
       }
     );
-
-
   };
 
   this.organizeAnswers = function(gameObj) {
@@ -124,15 +182,18 @@ function TriviaGame(questions) {
 
     for(var i=0; i<10; i++) {
       gameObj.questions[i].ansrOpts = [];
+
       for(var j=0; j<3; j++) {
         gameObj.questions[i].ansrOpts[j] = gameObj.questions[i].incorrect_answers[j];
       }
+
       gameObj.questions[i].ansrOpts.push(gameObj.questions[i].correct_answer);
 
       utils.shuffleArray(gameObj.questions[i].ansrOpts);
     }
 
   };
+
   this.next = function(gameObj) {
     var gameObj = gameObj;
       gameObj.renderGameBoard(gameBoardAttrs);
@@ -143,8 +204,6 @@ function TriviaGame(questions) {
   };
 
   this.renderGameBoard = function(attrObj) {
-    // $("#liveQues").empty();
-    // $("#liveAnsrOpts").empty();
     $("#gameBoardSwitch").empty();
     $(".ansrDisplay").empty();
 
@@ -152,7 +211,7 @@ function TriviaGame(questions) {
 
     for(var i=0; i<gbRows.length; i++) {
       var newRow = $("<div></div>");
-      newRow.addClass("row").addClass(gbRows[1].className);
+      newRow.addClass("row").addClass(gbRows[i].className);
 
       var newSpan = $("<span></span>");
       newSpan.attr("id", gbRows[i].spanId);
@@ -165,16 +224,19 @@ function TriviaGame(questions) {
       $("#gameBoardSwitch").append(newRow);
     }
   };
+
   this.dispNxtQues = function(gameObj) {
     var gameObj = gameObj;
     gameObj.dispNxtQuesStr(gameObj);
     gameObj.dispNxtQuesAnsrOpts(gameObj);
     gameObj.dispAnsrSubmit(gameObj);
   };
+
   this.dispNxtQuesStr = function(gameObj) {
     var gameObj = gameObj
     $("#liveQues").text(gameObj.questions[gameObj.curQuesIndex].question);
   };
+
   this.dispNxtQuesAnsrOpts = function(gameObj) {
     var gameObj = gameObj;
     var newUl = $("<ul></ul>");
@@ -202,13 +264,16 @@ function TriviaGame(questions) {
       }
     });
   };
+
   this.dispAnsrSubmit = function(gameObj) {
     var gameObj = gameObj
     var btn = $("<button></button>");
     btn.attr("id","ansrSubBtn");
+    btn.addClass("btn btn-default quesSub-buttons")
     btn.text("Click It Here");
     $("#gamePlayBtns").append(btn);
   };
+
   this.questionResults = function(gameObj) {
     var gameObj = gameObj;
     $("#ansrSubBtn").on("click", function() {
@@ -219,6 +284,7 @@ function TriviaGame(questions) {
       }
     });
   };
+
   this.compareAnsr = function(game) {
     var gameObj = game;
     if(gameObj.userGuess == gameObj.questions[gameObj.curQuesIndex].correct_answer) {
@@ -227,6 +293,7 @@ function TriviaGame(questions) {
       return false;
     }
   };
+
   this.quesRight = function(gameObj) {
     var gameObj = gameObj;
     clearInterval(gameObj.clockUp);
@@ -241,6 +308,7 @@ function TriviaGame(questions) {
       setTimeout(gameObj.gameOver, 2000, gameObj);
     }
   };
+
   this.quesWrong = function(gameObj) {
     var gameObj = gameObj;
     clearInterval(gameObj.clockUp);
@@ -255,6 +323,7 @@ function TriviaGame(questions) {
       setTimeout(gameObj.gameOver, 2000, gameObj);
     }
   };
+
   this.quesTimeUp = function(gameObj) {
     var gameObj = gameObj;
     clearInterval(gameObj.clockUp);
@@ -269,11 +338,13 @@ function TriviaGame(questions) {
       setTimeout(gameObj.gameOver, 2000, gameObj);
     }
   };
+
   this.renderAnsrDisplay = function() {
     $("#gameBoardSwitch").empty();
+    $("#liveAnsrOpts").empty();
 
-    var container = $("<div></div>");
-    container.addClass("row ansrDisplay");
+    var ansrDispContainer = $("<div></div>");
+    ansrDispContainer.addClass("row ansrDisplay");
 
     var row1 = $("<div></div>");
     row1.addClass("row");
@@ -297,45 +368,57 @@ function TriviaGame(questions) {
 
     row2.append(newP2);
 
-    container.append(row1).append(row2);
+    ansrDispContainer.append(row1).append(row2);
 
-    $("#gameBoard").append(container);
+    $("#gameBoardSwitch").append(ansrDispContainer);
   };
+
   this.ansrDispCorrect = function(gameObj) {
     var gameObj = gameObj;
-    $("#ansrDispHeader").text("Good Job You Oh You!");
-    $("#ansrDispAnsr").text("The Answer is: " + gameObj.questions[gameObj.curQuesIndex].correct_answer);
+    $("#ansrDispHeader").text("Good Job!");
+    $("#ansrDispAnsr").text("The Answer is: " + " " + gameObj.questions[gameObj.curQuesIndex].correct_answer);
   };
+
   this.ansrDispIncorrect = function(gameObj) {
     var gameObj = gameObj;
-    $("#ansrDispHeader").text("Oh No! That's Completely and Utterly Wrong, You Poor Thing You");
+    $("#ansrDispHeader").text("Oh No! That's Not Correct!");
     $("#ansrDispAnsr").text("The Answer is: " + gameObj.questions[gameObj.curQuesIndex].correct_answer);
   };
+
   this.ansrDispTimeUp = function(gameObj) {
     var gameObj = gameObj;
-    $("#ansrDispHeader").text("Oh No! You're Terrible! You Ran Out of Time!");
+    $("#ansrDispHeader").text("Oh No! You Ran Out of Time!");
     $("#ansrDispAnsr").text("The Answer is: " + gameObj.questions[gameObj.curQuesIndex].correct_answer);
   };
+
   this.gameOver = function(gameObj) {
     var gameObj = gameObj;
     clearInterval(gameObj.clockUp);
     $("#timer").empty();
+
     gameObj.renderGameBoard(gameOverAttrs);
     gameObj.renderGameOver(gameObj);
     gameObj.renderReset(gameObj);
   };
+
   this.renderGameOver = function(gameObj) {
     var gameObj = gameObj;
+
     $("#gameOverHeader").text("Game Over");
+
     var newUl = $("<ul></ul>");
     var newLi = $("<li></li>").text("Total Correct: " + gameObj.totCorAnsr);
     newUl.append(newLi);
+
     var newLi2 = $("<li></li>").text("Total Incorrect: " + gameObj.totIncorAnsr);
     newUl.append(newLi2);
+
     $("#gameOverBody").html(newUl);
   };
+
   this.dispClock = function(quesTime, gameObj) {
     var gameObj = gameObj;
+
     gameObj.clock = quesTime;
     gameObj.clockUp = setInterval(function(){
         $("#timer").text(gameObj.clock + " seconds left ...");
@@ -347,20 +430,33 @@ function TriviaGame(questions) {
       }, 1000);
 
   };
+
   this.renderReset = function(gameObj) {
     var gameObj = gameObj
-    var btn = $("<button></button>");
-    btn.attr("id","game-over-btns-row");
-    btn.text("Click It Here");
-    $("#gameOverBtns").append(btn);
 
-    $("#gameOverBtns").on("click",function() {
-      console.log("reset clicked");
+    var btn1 = $("<button></button>");
+    btn1.addClass("btn btn-default game-over-btns").attr("value","new");
+    btn1.text("New Game");
+    $("#gameOverBtns").append(btn1);
+
+    var btn2 = $("<button></button>");
+    btn2.addClass("btn btn-default game-over-btns").attr("value","theme");
+    btn2.text("New Category");
+    $("#gameOverBtns").append(btn2);
+
+    $(".game-over-btns").on("click",function() {
+
       gameObj.userGuess = "";
       gameObj.totCorAnsr = 0;
       gameObj.totIncorAnsr = 0;
       gameObj.curQuesIndex = 0;
-      gameObj.callAJAX(gameObj);
+
+      if(this.value === "new") {
+        gameObj.callAJAX(gameObj,gameObj.curCategory);
+      } else if(this.value === "theme") {
+        gameObj.renderCategoryBtns(gameObj);
+        gameObj.chooseCat(gameObj);
+      }
     });
   };
 }

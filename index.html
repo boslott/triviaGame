@@ -17,6 +17,9 @@
   <!-- Bootstrap 3.3.7 CDN -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
 
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Bubblegum+Sans|Fredoka+One|Frijole|Prosto+One" rel="stylesheet">
+
   <!-- Trivia Game CSS -->
   <link rel="stylesheet" href="assets/css/styles.css" />
 
@@ -24,28 +27,56 @@
  </head>
  <body>
 
+   <header class="site-header">
+
+     <p class="site-header-logo">
+       A Game of Trivia
+     </p>
+
+   </header>
+
    <div class="game-board-outer">
 
      <div class="container game-board" id="gameBoard">
-
-       <!-- <div class="row curtains"> -->
 
        <div class="row" id="gameBoardSwitch">
 
        </div> <!-- Close gameBoardSwitch -->
 
-     <!-- </div> -->
-
      </div> <!-- Close game-board -->
 
-     <div class="timer-row">
+     <div class="row timer-row">
        <p>
          <span id="timer"></span>
        </p>
-     </div>
+     </div> <!-- Close timer-row -->
+
+     <div class="row instructions">
+       <h2>
+         Instructions
+       </h2>
+       <p>
+         Choose your category
+         <br / ><br />
+         You will be given 10 questions based on the category you choose
+         <br /><br />
+         Do your best to answer each question correctly
+         <br /><br />
+         After you answer all the questions, you will be shown your totals and you will be offered two options, to start a new game using the same category or choose a new category
+         <br /><br />
+         Best of Luck!
+       </p>
+     </div> <!-- Close row sinstructions -->
 
    </div> <!-- Close game-board-outer -->
 
+   <div class="site-footer">
+
+     <p>
+       &copy; Copyright Bo Slott 2017 - All Rights Reserved
+     </p>
+
+   </div>
 
 
 
